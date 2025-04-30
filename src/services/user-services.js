@@ -23,7 +23,18 @@ async function loginUser(email) {
   }
 }
 
+async function getUserId(id) {
+  try {
+    const user = await userRepository.get(id);
+    return user;
+  } catch (error) {
+    console.log("Error inside get user", error.message);
+    throw error;
+  }
+}
+
 module.exports = {
   createUser,
   loginUser,
+  getUserId,
 };

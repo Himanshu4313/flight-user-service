@@ -31,7 +31,7 @@ async function createUser(req, res) {
     }
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
-      message: "Something went wrong while creating user ",
+      message: "Something went wrong while loggedIn ",
       data: {},
       error: error,
     });
@@ -42,6 +42,13 @@ async function login(req, res) {
   try {
     const { email, password } = req.body;
     const user = await userService.loginUser(email);
+
+    const userDetails = {
+      id: user.id,
+      name: user.fullName,
+      email: user.email,
+      phoneNumber: user.phoneNumber,
+    };
 
     if (user == null) {
       return res.status(StatusCodes.BAD_REQUEST).json({
@@ -78,7 +85,7 @@ async function login(req, res) {
     return res.status(StatusCodes.OK).json({
       success: true,
       message: "LogIn Successfully",
-      data: user,
+      data: userDetails,
       error: {},
     });
   } catch (error) {
@@ -91,7 +98,74 @@ async function login(req, res) {
   }
 }
 
+async function logout(req, res) {
+  try {
+    const userDetails = req.user;
+
+    console.log("user Details", userDetails);
+
+    if (!userDetails) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: "NOT USER EXIST",
+      });
+    }
+
+    res.cookie("token", null, {
+      httpOnly: true,
+    });
+
+    return res.status(StatusCodes.OK).json({
+      success: true,
+      message: "Logged Out Successfully",
+    });
+  } catch (error) {
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: "Something went wrong while logout the user ",
+      data: {},
+      error: error,
+    });
+  }
+}
+
+async function getUser(req, res) {
+  try {
+    const user = await userService.getUserId(req.params.id);
+
+    if (!user) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: "User is not found",
+      });
+    }
+
+    const userDetails = {
+      id: user.id,
+      name: user.fullName,
+      email: user.email,
+      phoneNumber: user.phoneNumber,
+    };
+
+    return res.status(StatusCodes.OK).json({
+      success: true,
+      message: "User Found",
+      data: userDetails,
+      error: {},
+    });
+  } catch (error) {
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: "Something went wrong while getting the user ",
+      data: {},
+      error: error,
+    });
+  }
+}
+
 module.exports = {
   createUser,
   login,
+  logout,
+  getUser,
 };
