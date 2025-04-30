@@ -1,3 +1,4 @@
 module.exports = {
-    userService:require('./user-services')
+    userService:require('./user-services'),
+    bookingDetailsService:require('./BookingDetails-service')
 }
